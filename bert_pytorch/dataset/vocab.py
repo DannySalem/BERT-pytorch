@@ -2,6 +2,8 @@ import pickle
 import tqdm
 from collections import Counter
 
+from .utils.sep_SMILES import tokenize_SMILES
+ 
 
 class TorchVocab(object):
     """Defines a vocabulary object that will be used to numericalize a field.
@@ -39,17 +41,17 @@ class TorchVocab(object):
         min_freq = max(min_freq, 1)
 
         self.itos = list(specials)
-        # frequencies of special tokens are not counted when building vocabulary
-        # in frequency order
-        for tok in specials:
-            del counter[tok]
+        # frequencies of special tokens are not counted when building vocabulary in frequency order
+        for tokens in specials:
+            del counter[tokens]
 
         max_size = None if max_size is None else max_size + len(self.itos)
 
-        # sort by frequency, then alphabetically
+        # Sort Vocabulary list by frequency, then alphabetically, tup[0] and tup[1] is the freq, and token respectively
         words_and_frequencies = sorted(counter.items(), key=lambda tup: tup[0])
         words_and_frequencies.sort(key=lambda tup: tup[1], reverse=True)
 
+        # Make token list from words_and_frequencies but remove infrequent words
         for word, freq in words_and_frequencies:
             if freq < min_freq or len(self.itos) == max_size:
                 break
@@ -117,15 +119,12 @@ class Vocab(TorchVocab):
 
 # Building Vocab with text files
 class WordVocab(Vocab):
+    # Count number of lines in vocab text file and run __init__ from inherited Class Vocab 
     def __init__(self, texts, max_size=None, min_freq=1):
         print("Building Vocab")
         counter = Counter()
         for line in tqdm.tqdm(texts):
-            if isinstance(line, list):
-                words = line
-            else:
-                words = line.replace("\n", "").replace("\t", "").split()
-
+            words = tokenize_SMILES(line)
             for word in words:
                 counter[word] += 1
         super().__init__(counter, max_size=max_size, min_freq=min_freq)
@@ -168,7 +167,7 @@ class WordVocab(Vocab):
 
 
 def build():
-    import argparse
+    '''import argparse
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--corpus_path", required=True, type=str)
@@ -176,10 +175,13 @@ def build():
     parser.add_argument("-s", "--vocab_size", type=int, default=None)
     parser.add_argument("-e", "--encoding", type=str, default="utf-8")
     parser.add_argument("-m", "--min_freq", type=int, default=1)
-    args = parser.parse_args()
+    args = parser.parse_args()'''
 
-    with open(args.corpus_path, "r", encoding=args.encoding) as f:
-        vocab = WordVocab(f, max_size=args.vocab_size, min_freq=args.min_freq)
+    corpus_path='G:/SMERT/corpus.txt'
+    output_path='G:/SMERT/test.txt'
+
+    with open(corpus_path, "r") as f:
+        vocab = WordVocab(f)
 
     print("VOCAB SIZE:", len(vocab))
-    vocab.save_vocab(args.output_path)
+    vocab.save_vocab(output_path)
