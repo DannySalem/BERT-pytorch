@@ -91,24 +91,17 @@ class BERTTrainer:
                               bar_format="{l_bar}{r_bar}")
 
         avg_loss = 0.0
-        total_correct = 0
         total_element = 0
 
         for i, data in data_iter:
             # 0. batch_data will be sent into the device(GPU or cpu)
             data = {key: value.to(self.device) for key, value in data.items()}
 
-            # 1. forward the next_sentence_prediction and masked_lm model
-            next_sent_output, mask_lm_output = self.model.forward(data["bert_input"], data["segment_label"])
-
-            # 2-1. NLL(negative log likelihood) loss of is_next classification result
-            next_loss = self.criterion(next_sent_output, data["is_next"])
+            # 1. forward the masked_lm model
+            mask_lm_output = self.model.forward(data["bert_input"], data["segment_label"])
 
             # 2-2. NLLLoss of predicting masked token word
-            mask_loss = self.criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
-
-            # 2-3. Adding next_loss and mask_loss : 3.4 Pre-training Procedure
-            loss = next_loss + mask_loss
+            loss = self.criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
 
             # 3. backward and optimization only in train
             if train:
@@ -116,25 +109,20 @@ class BERTTrainer:
                 loss.backward()
                 self.optim_schedule.step_and_update_lr()
 
-            # next sentence prediction accuracy
-            correct = next_sent_output.argmax(dim=-1).eq(data["is_next"]).sum().item()
+
             avg_loss += loss.item()
-            total_correct += correct
-            total_element += data["is_next"].nelement()
 
             post_fix = {
                 "epoch": epoch,
                 "iter": i,
-                "avg_loss": avg_loss / (i + 1),
-                "avg_acc": total_correct / total_element * 100,
+                "avg_loss": avg_loss / (i + 1)
                 "loss": loss.item()
             }
 
             if i % self.log_freq == 0:
                 data_iter.write(str(post_fix))
 
-        print("EP%d_%s, avg_loss=" % (epoch, str_code), avg_loss / len(data_iter), "total_acc=",
-              total_correct * 100.0 / total_element)
+        print("EP%d_%s, avg_loss=" % (epoch, str_code), avg_loss / len(data_iter))
 
     def save(self, epoch, file_path="output/bert_trained.model"):
         """

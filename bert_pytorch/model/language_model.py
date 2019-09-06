@@ -22,7 +22,7 @@ class BERTLM(nn.Module):
 
     def forward(self, x, segment_label):
         x = self.bert(x, segment_label)
-        return self.next_sentence(x), self.mask_lm(x)
+        return self.mask_lm(x)
 
 
 class NextSentencePrediction(nn.Module):
