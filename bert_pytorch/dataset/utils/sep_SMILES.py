@@ -7,7 +7,7 @@ test_string = 'CC(O)=O.CCNC(=O)[C@@H]1CCCN1C(=O)[C@H](CCCNC(N)=N)NC(=O)[C@H](CC(
 
 def tokenize_SMILES(input_string = test_string):
     regex = '([A-Z][a-z])'
-
+    #print(input_string)
     token_list = re.split(regex, input_string)
 
     if len(token_list)>1:
@@ -29,4 +29,4 @@ def tokenize_SMILES(input_string = test_string):
     return token_list
 
 
-print(tokenize_SMILES())
+#print(tokenize_SMILES())

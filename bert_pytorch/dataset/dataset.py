@@ -42,7 +42,7 @@ class BERTDataset(Dataset):
 
         t1_label = [self.vocab.pad_index] + t1_label + [self.vocab.pad_index]
 
-        segment_label = ([1 for _ in range(len(t1))] + [2 for _ in range(len(t2))])[:self.seq_len]
+        segment_label = ([1 for _ in range(len(t1))])[:self.seq_len]
         bert_input = t1[:self.seq_len]
         bert_label = t1_label[:self.seq_len]
 
@@ -51,12 +51,11 @@ class BERTDataset(Dataset):
 
         output = {"bert_input": bert_input,
                   "bert_label": bert_label,
-                  "segment_label": segment_label,
-                  "is_next": is_next_label}
+                  "segment_label": segment_label}
 
         return {key: torch.tensor(value) for key, value in output.items()}
 
-    def random_word(self, sentence):seq_len
+    def random_word(self, sentence):
         tokens = sentence.split()
         output_label = []
 

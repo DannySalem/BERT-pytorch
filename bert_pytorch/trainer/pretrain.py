@@ -115,7 +115,7 @@ class BERTTrainer:
             post_fix = {
                 "epoch": epoch,
                 "iter": i,
-                "avg_loss": avg_loss / (i + 1)
+                "avg_loss": avg_loss / (i + 1),
                 "loss": loss.item()
             }
 
