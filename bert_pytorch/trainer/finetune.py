@@ -59,7 +59,7 @@ class ClassTrainer:
 
         # Using Negative Log Likelihood Loss function for predicting the masked_token
          #### change to torch.nn.BCELoss
-        self.criterion = nn.NLLLoss(ignore_index=0)
+        self.criterion = nn.BCELoss
 
         self.log_freq = log_freq
 
@@ -100,7 +100,7 @@ class ClassTrainer:
             class_output = self.model.forward(data["bert_input"], data["segment_label"])
 
             # 2-2. NLLLoss of predicting masked token word
-            loss = self.criterion(class_output.transpose(1, 2), data["bert_label"])
+            loss = self.criterion(class_output, data["bert_label"])
 
             # 3. backward and optimization only in train
             if train:
