@@ -1,8 +1,9 @@
 from torch.utils.data import Dataset
 import tqdm
+from .utils.sep_SMILES import tokenize_SMILES
 import torch
 import random
-
+import pdb
 
 class BERTDataset(Dataset):
     def __init__(self, corpus_path, vocab, seq_len, encoding="utf-8", corpus_lines=None, on_memory=True):
@@ -53,10 +54,11 @@ class BERTDataset(Dataset):
                   "bert_label": bert_label,
                   "segment_label": segment_label}
 
+
         return {key: torch.tensor(value) for key, value in output.items()}
 
     def random_word(self, sentence):
-        tokens = sentence.split()
+        tokens = tokenize_SMILES(sentence)
         output_label = []
 
         for i, token in enumerate(tokens):

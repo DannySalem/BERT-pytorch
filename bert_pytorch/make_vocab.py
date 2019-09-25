@@ -30,4 +30,4 @@ train_dataset = BERTDataset(train_dataset, vocab, seq_len=seq_len, on_memory=on_
 #vocab.save_vocab(args.output_path)
 
 
-# -c data/corpus.small -v data/vocab.small -o output/bert.model
+# -c data/corpus.txt -v data/vocab.pkl -o output/bert.model
