@@ -3,7 +3,7 @@ import pdb
 from torch.utils.data import DataLoader
 
 from .model import BERT
-from .trainer import BERTTrainer
+from .trainer import BERTTrainer, ClassTrainer
 from .dataset import BERTDataset, WordVocab
 
 def train():
@@ -13,11 +13,12 @@ def train():
     parser.add_argument("-t", "--test_dataset", type=str, default=None, help="test set for evaluate train set")
     parser.add_argument("-v", "--vocab_path", required=True, type=str, help="built vocab model path with bert-vocab")
     parser.add_argument("-o", "--output_path", required=True, type=str, help="ex)output/bert.model")
+    parser.add_argument("-mt", "--model_type", type=str, default='p', help="f for finetune, p for pretrain")
 
     parser.add_argument("-hs", "--hidden", type=int, default=256, help="hidden size of transformer model")
     parser.add_argument("-l", "--layers", type=int, default=8, help="number of layers")
     parser.add_argument("-a", "--attn_heads", type=int, default=8, help="number of attention heads")
-    parser.add_argument("-s", "--seq_len", type=int, default=20, help="maximum sequence len")
+    parser.add_argument("-s", "--seq_len", type=int, default=401, help="maximum sequence len")
 
     parser.add_argument("-b", "--batch_size", type=int, default=18, help="number of batch_size")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="number of epochs")
@@ -43,7 +44,7 @@ def train():
     print("Loading Train Dataset", args.train_dataset)
     train_dataset = BERTDataset(args.train_dataset, vocab, seq_len=args.seq_len,
                                 corpus_lines=args.corpus_lines, on_memory=args.on_memory)
-
+    #pdb.set_trace()
     print("Loading Test Dataset", args.test_dataset)
     test_dataset = BERTDataset(args.test_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory) \
         if args.test_dataset is not None else None
@@ -57,7 +58,12 @@ def train():
     bert = BERT(len(vocab), hidden=args.hidden, n_layers=args.layers, attn_heads=args.attn_heads)
 
     print("Creating BERT Trainer")
-    trainer = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, test_dataloader=test_data_loader,
+    if args.model_type == 'p':
+        trainer = BERTTrainer(bert, len(vocab), train_dataloader=train_data_loader, test_dataloader=test_data_loader,
+                          lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
+                          with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
+    elif args.model_type == 'f':
+        trainer = ClassTrainer(bert, len(vocab), train_dataloader=train_data_loader, test_dataloader=test_data_loader,
                           lr=args.lr, betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
                           with_cuda=args.with_cuda, cuda_devices=args.cuda_devices, log_freq=args.log_freq)
 

@@ -36,8 +36,9 @@ class ClassificationModel(nn.Module):
         :param vocab_size: total vocab size
         """
         super().__init__()
-        self.linear = nn.Linear(hidden, vocab_size)
-        self.softmax = nn.LogSoftmax(dim=-1)
+        self.linear = nn.Linear(hidden, 2)
+        #self.softmax = nn.LogSoftmax(dim=-1)
 
     def forward(self, x):
-        return self.softmax(self.linear(x))
+        #return self.softmax(self.linear(x))#[:, 0]))
+        return self.linear(x)[:, 0]

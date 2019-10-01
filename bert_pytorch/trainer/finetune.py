@@ -7,6 +7,7 @@ from ..model import BERTLCM, BERT
 from .optim_schedule import ScheduledOptim
 
 import tqdm
+import pdb
 
 
 class ClassTrainer:
@@ -58,8 +59,7 @@ class ClassTrainer:
         self.optim_schedule = ScheduledOptim(self.optim, self.bert.hidden, n_warmup_steps=warmup_steps)
 
         # Using Negative Log Likelihood Loss function for predicting the masked_token
-         #### change to torch.nn.BCELoss
-        self.criterion = nn.BCELoss
+        self.criterion = nn.BCELoss()
 
         self.log_freq = log_freq
 
@@ -91,16 +91,19 @@ class ClassTrainer:
                               bar_format="{l_bar}{r_bar}")
 
         avg_loss = 0.0
-
         for i, data in data_iter:
             # 0. batch_data will be sent into the device(GPU or cpu)
             data = {key: value.to(self.device) for key, value in data.items()}
-
-            # 1. forward the masked_lm model
+            # 1. forward the classification model
             class_output = self.model.forward(data["bert_input"], data["segment_label"])
+            #print(class_output)
+            #print(data["class_label"])
+            #print(class_output.shape)
+            #print(data["class_label"].shape)            
+            # 2-2. BCELoss of Classification
+            loss = self.criterion(class_output, data["class_label"])
 
-            # 2-2. NLLLoss of predicting masked token word
-            loss = self.criterion(class_output, data["bert_label"])
+
 
             # 3. backward and optimization only in train
             if train:

@@ -21,7 +21,7 @@ class BERTDataset(Dataset):
                     self.corpus_lines += 1
 
             if on_memory:
-                self.lines = [line[:-2] for line in tqdm.tqdm(f, desc="Loading Dataset", total=corpus_lines)]
+                self.lines = [line[:-1] for line in tqdm.tqdm(f, desc="Loading Dataset", total=corpus_lines)]
                 self.corpus_lines = len(self.lines)
 
         if not on_memory:
@@ -35,7 +35,17 @@ class BERTDataset(Dataset):
         return self.corpus_lines
 
     def __getitem__(self, item):
+        #class_label = []
         t1 = self.random_sent(item)
+        
+        if len(t1.split('\t')) > 1:
+            t1, class_label = t1.split('\t')
+
+        if class_label=='1':
+            class_label = [float(0),float(1)]
+        else:
+            class_label = [float(1),float(0)]
+
         t1_random, t1_label = self.random_word(t1)
 
         # [CLS] tag = SOS tag, [SEP] tag = EOS tag
@@ -52,8 +62,8 @@ class BERTDataset(Dataset):
 
         output = {"bert_input": bert_input,
                   "bert_label": bert_label,
-                  "segment_label": segment_label}
-
+                  "segment_label": segment_label,
+                  "class_label": class_label}
 
         return {key: torch.tensor(value) for key, value in output.items()}
 
