@@ -101,6 +101,7 @@ class ClassTrainer:
             #print(class_output.shape)
             #print(data["class_label"].shape)            
             # 2-2. BCELoss of Classification
+            #pdb.set_trace()
             loss = self.criterion(class_output, data["class_label"])
 
 

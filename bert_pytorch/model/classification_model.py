@@ -37,8 +37,8 @@ class ClassificationModel(nn.Module):
         """
         super().__init__()
         self.linear = nn.Linear(hidden, 2)
-        #self.softmax = nn.LogSoftmax(dim=-1)
+        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, x):
-        #return self.softmax(self.linear(x))#[:, 0]))
-        return self.linear(x)[:, 0]
+        return self.softmax(self.linear(x[:, 0]))
+        #return self.linear(x)[:, 0]
