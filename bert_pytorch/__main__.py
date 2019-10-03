@@ -76,3 +76,5 @@ def train():
             trainer.test(epoch)
 
 train()
+
+#python -m bert-pytorch -c data/aromatase_traincorpus.txt -t data/aromatase_testcorpus.txt -v data/vocab.pkl -o output/bert.model
