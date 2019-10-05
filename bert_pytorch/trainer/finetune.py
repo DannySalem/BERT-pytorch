@@ -8,6 +8,7 @@ from .optim_schedule import ScheduledOptim
 
 import tqdm
 import pdb
+import numpy
 
 
 class ClassTrainer:
@@ -91,11 +92,17 @@ class ClassTrainer:
                               bar_format="{l_bar}{r_bar}")
 
         avg_loss = 0.0
+
+        truePositive, trueNegative, falsePositive, falseNegative = 0,0,0,0
         for i, data in data_iter:
             # 0. batch_data will be sent into the device(GPU or cpu)
             data = {key: value.to(self.device) for key, value in data.items()}
             # 1. forward the classification model
-            class_output = self.model.forward(data["bert_input"], data["segment_label"])
+            if train==False:
+                with torch.no_grad():
+                    class_output = self.model.forward(data["bert_input"], data["segment_label"])
+            else:
+                class_output = self.model.forward(data["bert_input"], data["segment_label"])
             #print(class_output)
             #print(data["class_label"])
             #print(class_output.shape)
@@ -104,6 +111,25 @@ class ClassTrainer:
             #pdb.set_trace()
             loss = self.criterion(class_output, data["class_label"])
 
+            # Get performance metrics
+            if train == False:
+                class_output1 = class_output.detach().cpu().numpy()
+                class_output1 = (class_output1[:,1]>class_output1[:,0])*1 
+                class_label = numpy.array(data["class_label"].cpu())
+                class_label1 = (class_label[:,1]>class_label[:,0])*1 
+                class_result = numpy.equal(class_output1,class_label1)
+                #pdb.set_trace()
+                for result, class_out in zip(class_result, class_output1):
+                    if result:
+                        if class_out:
+                            truePositive+=1
+                        else:
+                            trueNegative+=1
+                    else:
+                        if class_out:
+                            falsePositive+=1
+                        else:
+                            falseNegative+=1
 
 
             # 3. backward and optimization only in train
@@ -126,6 +152,13 @@ class ClassTrainer:
                 data_iter.write(str(post_fix))
 
         print("EP%d_%s, avg_loss=" % (epoch, str_code), avg_loss / len(data_iter))
+
+        if train==False:
+            #print(truePositive, trueNegative, falsePositive, falseNegative)
+            sensitivity = truePositive / (truePositive + falseNegative)
+            specificity = trueNegative / (trueNegative + falsePositive)
+            print(f"Sensitivity: {sensitivity}, Specificity: {specificity}")
+
 
     def save(self, epoch, file_path="output/bert_trained.model"):
         """

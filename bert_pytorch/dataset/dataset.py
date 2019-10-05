@@ -17,10 +17,12 @@ class BERTDataset(Dataset):
 
         with open(corpus_path, "r", encoding=encoding) as f:
             if self.corpus_lines is None and not on_memory:
+                # Count Number of Lines In Data Corpus
                 for _ in tqdm.tqdm(f, desc="Loading Dataset", total=corpus_lines):
                     self.corpus_lines += 1
 
             if on_memory:
+                # Put every line of COrpus into List/Array, Get Number of Lines 
                 self.lines = [line[:-1] for line in tqdm.tqdm(f, desc="Loading Dataset", total=corpus_lines)]
                 self.corpus_lines = len(self.lines)
 
@@ -36,7 +38,7 @@ class BERTDataset(Dataset):
 
     def __getitem__(self, item):
         #class_label = []
-        t1 = self.random_sent(item)
+        t1 = self.get_corpus_line(item)
         
         if len(t1.split('\t')) > 1:
             t1, class_label = t1.split('\t')
@@ -95,11 +97,6 @@ class BERTDataset(Dataset):
                 output_label.append(0)
 
         return tokens, output_label
-
-    def random_sent(self, index):
-        t = self.get_corpus_line(index)
-
-        return t
 
     def get_corpus_line(self, item):
         if self.on_memory:

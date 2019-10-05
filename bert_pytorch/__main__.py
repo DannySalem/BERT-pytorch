@@ -42,16 +42,15 @@ def train():
     print("Vocab Size: ", len(vocab))
 
     print("Loading Train Dataset", args.train_dataset)
-    train_dataset = BERTDataset(args.train_dataset, vocab, seq_len=args.seq_len,
-                                corpus_lines=args.corpus_lines, on_memory=args.on_memory)
+    train_dataset = BERTDataset(args.train_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory)
     #pdb.set_trace()
     print("Loading Test Dataset", args.test_dataset)
     test_dataset = BERTDataset(args.test_dataset, vocab, seq_len=args.seq_len, on_memory=args.on_memory) \
         if args.test_dataset is not None else None
 
     print("Creating Dataloader")
-    train_data_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
-    test_data_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers) \
+    train_data_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=True)
+    test_data_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=True) \
         if test_dataset is not None else None
 
     print("Building BERT model")
@@ -77,4 +76,4 @@ def train():
 
 train()
 
-#python -m bert-pytorch -c data/aromatase_traincorpus.txt -t data/aromatase_testcorpus.txt -v data/vocab.pkl -o output/bert.model
+#python -m bert_pytorch -c data/aromatase_traincorpus.txt -t data/aromatase_testcorpus.txt -v data/vocab.pkl -o output/bert.model -mt f
