@@ -20,6 +20,7 @@ class BERTLCM(nn.Module):
 
     def forward(self, x, segment_label):
         x = self.bert(x, segment_label)
+        #return self.bert(x, segment_label)
         return self.class_model(x)
 
 
@@ -40,5 +41,6 @@ class ClassificationModel(nn.Module):
         self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, x):
+        #return self.softmax(self.linear(x))#(x[:, 0]))
         return self.softmax(self.linear(x[:, 0]))
         #return self.linear(x)[:, 0]

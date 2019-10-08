@@ -60,7 +60,7 @@ class ClassTrainer:
         self.optim_schedule = ScheduledOptim(self.optim, self.bert.hidden, n_warmup_steps=warmup_steps)
 
         # Using Negative Log Likelihood Loss function for predicting the masked_token
-        self.criterion = nn.BCELoss()
+        self.criterion = nn.NLLLoss(weight = torch.tensor([1,20]).float().to(self.device))
 
         self.log_freq = log_freq
 
@@ -109,14 +109,14 @@ class ClassTrainer:
             #print(data["class_label"].shape)            
             # 2-2. BCELoss of Classification
             #pdb.set_trace()
-            loss = self.criterion(class_output, data["class_label"])
+            loss = self.criterion(class_output, data["class_label"].long())
 
             # Get performance metrics
             if train == False:
                 class_output1 = class_output.detach().cpu().numpy()
                 class_output1 = (class_output1[:,1]>class_output1[:,0])*1 
-                class_label = numpy.array(data["class_label"].cpu())
-                class_label1 = (class_label[:,1]>class_label[:,0])*1 
+                class_label1 = numpy.array(data["class_label"].cpu())
+                #class_label1 = (class_label[:,1]>class_label[:,0])*1 
                 class_result = numpy.equal(class_output1,class_label1)
                 #pdb.set_trace()
                 for result, class_out in zip(class_result, class_output1):

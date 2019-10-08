@@ -42,11 +42,12 @@ class BERTDataset(Dataset):
         
         if len(t1.split('\t')) > 1:
             t1, class_label = t1.split('\t')
+            class_label = float(class_label)
 
-        if class_label=='1':
-            class_label = [float(0),float(1)]
-        else:
-            class_label = [float(1),float(0)]
+        #if class_label=='1':
+        ##    class_label = [float(0),float(1)]
+        #else:
+        #    class_label = [float(1),float(0)]
 
         t1_random, t1_label = self.random_word(t1)
 

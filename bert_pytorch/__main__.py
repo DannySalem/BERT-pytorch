@@ -21,7 +21,7 @@ def train():
     parser.add_argument("-s", "--seq_len", type=int, default=401, help="maximum sequence len")
 
     parser.add_argument("-b", "--batch_size", type=int, default=18, help="number of batch_size")
-    parser.add_argument("-e", "--epochs", type=int, default=10, help="number of epochs")
+    parser.add_argument("-e", "--epochs", type=int, default=500, help="number of epochs")
     parser.add_argument("-w", "--num_workers", type=int, default=5, help="dataloader worker size")
 
     parser.add_argument("--with_cuda", type=bool, default=True, help="training with CUDA: true, or false")
@@ -69,7 +69,8 @@ def train():
     print("Training Start")
     for epoch in range(args.epochs):
         trainer.train(epoch)
-        trainer.save(epoch, args.output_path)
+        if epoch % 10 == 0:
+            trainer.save(epoch, args.output_path)
 
         if test_data_loader is not None:
             trainer.test(epoch)
