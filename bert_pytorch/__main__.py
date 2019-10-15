@@ -36,6 +36,12 @@ def train():
     parser.add_argument("--adam_beta2", type=float, default=0.999, help="adam first beta value")
 
     args = parser.parse_args()
+    ## Make Vocab
+    #with open(args.train_dataset, "r") as f:
+    #    vocab = WordVocab(f)
+    #print("VOCAB SIZE:", len(vocab))
+    #vocab.save_vocab(args.output_path)
+    #pdb.set_trace()
 
     print("Loading Vocab", args.vocab_path)
     vocab = WordVocab.load_vocab(args.vocab_path)
@@ -78,3 +84,4 @@ def train():
 train()
 
 #python -m bert_pytorch -c data/aromatase_traincorpus.txt -t data/aromatase_testcorpus.txt -v data/vocab.pkl -o output/bert.model -mt f
+#python -m bert_pytorch -c data/ChemBlDB.txt -v data/vocab.pkl -o output/bert.model -s 2072

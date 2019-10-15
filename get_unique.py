@@ -13,7 +13,7 @@ def get_unique():
 
 def get_maxLength():
 
-    with open('data/corpus.txt', "r") as f:
+    with open('data/ChemBlDB.txt', "r") as f:
         maxLength=0
         for line in f:
             lineLength = len(line)

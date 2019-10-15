@@ -102,7 +102,7 @@ class BERTTrainer:
             # 1. forward the masked_lm model
             mask_lm_output = self.model.forward(data["bert_input"], data["segment_label"])
 
-            pdb.set_trace()
+            #pdb.set_trace()
             # 2-2. NLLLoss of predicting masked token word
             loss = self.criterion(mask_lm_output.transpose(1, 2), data["bert_label"])
 

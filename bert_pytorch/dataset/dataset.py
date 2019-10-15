@@ -43,6 +43,8 @@ class BERTDataset(Dataset):
         if len(t1.split('\t')) > 1:
             t1, class_label = t1.split('\t')
             class_label = float(class_label)
+        else:
+            class_label = 0
 
         #if class_label=='1':
         ##    class_label = [float(0),float(1)]
